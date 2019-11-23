@@ -177,13 +177,15 @@ public class WaveletHaar implements PlugInFilter {
         int ny = input.getHeight();
         double pixel = 0.0;
         ImageAccess[] minhasIMG = new ImageAccess[4 + 3 * (interations - 1) ];
-        minhasIMG[0] = new ImageAccess(nx/2,ny/2);
-        minhasIMG[1] = new ImageAccess(nx/2,ny/2);
-        minhasIMG[2] = new ImageAccess(nx/2,ny/2);
-        minhasIMG[3] = new ImageAccess(nx/2,ny/2);
+
         switch(interations) {
 
             case 1:
+
+               	minhasIMG[0] = new ImageAccess(nx/2,ny/2);
+        		minhasIMG[1] = new ImageAccess(nx/2,ny/2);
+        		minhasIMG[2] = new ImageAccess(nx/2,ny/2);
+        		minhasIMG[3] = new ImageAccess(nx/2,ny/2);
 
                 for(int x=0; x<nx; x++){
                     for(int y=0; y<ny; y++){
@@ -211,127 +213,217 @@ public class WaveletHaar implements PlugInFilter {
                 }
                 break;
 
+            case 2:
+			    minhasIMG[0] = new ImageAccess(nx/2,ny/2);
+        		minhasIMG[1] = new ImageAccess(nx/2,ny/2);
+        		minhasIMG[2] = new ImageAccess(nx/2,ny/2);
+        		minhasIMG[3] = new ImageAccess(nx/2,ny/2);
+        		minhasIMG[4] = new ImageAccess(nx/2,ny/2);
+        		minhasIMG[5] = new ImageAccess(nx/2,ny/2);
+        		minhasIMG[6] = new ImageAccess(nx/2,ny/2);
+        		minhasIMG[7] = new ImageAccess(nx/2,ny/2);
+
+		        for(int x=0; x<nx; x++){
+		            for(int y=0; y<ny; y++){
+
+		                if(x<nx/4 && y<ny/4){
+		                    pixel = input.getPixel(x,y);
+		                    minhasIMG[0].putPixel(x, y, pixel);
+		                }
+
+		                if(x>=nx/4 && y<ny/4 && x<nx/2){
+		                    pixel = input.getPixel(x,y);
+		                    minhasIMG[1].putPixel(x-nx/4, y, pixel);
+		                }
+
+		                if(x<nx/4 && y>=ny/4 && y<ny/2){
+		                    pixel = input.getPixel(x,y);
+		                    minhasIMG[2].putPixel(x, y-ny/4, pixel);
+		                }
+
+		                if(x>=nx/4 && y>=ny/4 && x<nx/2 && y<ny/2){
+		                    pixel = input.getPixel(x,y);
+		                    minhasIMG[3].putPixel(x-nx/4, y-ny/4, pixel);
+		                }
+
+		                if(x>=nx/2 && y<ny/2){
+		                    pixel = input.getPixel(x,y);
+		                    minhasIMG[4].putPixel(x-nx/2, y, pixel);
+		                }
+
+		                if(x<nx/2 && y>=ny/2){
+		                    pixel = input.getPixel(x,y);
+		                    minhasIMG[5].putPixel(x, y-ny/2, pixel);
+		                }
+
+		                if(x>=nx/2 && y>=ny/2){
+		                    pixel = input.getPixel(x,y);
+		                    minhasIMG[6].putPixel(x-nx/2, y-ny/2, pixel);
+		                }	                
+		            }
+		        }
+		    	break;
+
+		    case 3:
+			    minhasIMG[0] = new ImageAccess(nx/2,ny/2);
+        		minhasIMG[1] = new ImageAccess(nx/2,ny/2);
+        		minhasIMG[2] = new ImageAccess(nx/2,ny/2);
+        		minhasIMG[3] = new ImageAccess(nx/2,ny/2);
+        		minhasIMG[4] = new ImageAccess(nx/2,ny/2);
+        		minhasIMG[5] = new ImageAccess(nx/2,ny/2);
+        		minhasIMG[6] = new ImageAccess(nx/2,ny/2);
+        		minhasIMG[7] = new ImageAccess(nx/2,ny/2);
+        		minhasIMG[8] = new ImageAccess(nx/2,ny/2);
+        		minhasIMG[9] = new ImageAccess(nx/2,ny/2);
+
+		        for(int x=0; x<nx; x++){
+		            for(int y=0; y<ny; y++){
+
+		                if(x<nx/8 && y<ny/8){
+		                	pixel = input.getPixel(x,y);
+		                    minhasIMG[0].putPixel(x, y, pixel);
+		                }
+
+		                if(x>nx/8 && x<nx/4 && y<ny/8){
+		                	pixel = input.getPixel(x,y);
+		                    minhasIMG[1].putPixel(x-nx/8, y, pixel);
+		                }
+
+		                if(x>nx/8 && y<ny/4 && y>ny/8){
+		                	pixel = input.getPixel(x,y);
+		                    minhasIMG[2].putPixel(x, y-ny/8, pixel);
+		                }
+
+		                if(x>nx/8 && x<nx/4 && y>ny/8 && y<ny/8){
+		                	pixel = input.getPixel(x,y);
+		                    minhasIMG[3].putPixel(x-nx/8, y-ny/8, pixel);
+		                }
+
+		                if(x>=nx/4 && y<ny/4 && x<nx/2){
+		                    pixel = input.getPixel(x,y);
+		                    minhasIMG[4].putPixel(x-nx/4, y, pixel);
+		                }
+
+		                if(x<nx/4 && y>=ny/4 && y<ny/2){
+		                    pixel = input.getPixel(x,y);
+		                    minhasIMG[5].putPixel(x, y-ny/4, pixel);
+		                }
+
+		                if(x>=nx/4 && y>=ny/4 && x<nx/2 && y<ny/2){
+		                    pixel = input.getPixel(x,y);
+		                    minhasIMG[6].putPixel(x-nx/4, y-ny/4, pixel);
+		                }
+
+		                if(x>=nx/2 && y<ny/2){
+		                    pixel = input.getPixel(x,y);
+		                    minhasIMG[7].putPixel(x-nx/2, y, pixel);
+		                }
+
+		                if(x<nx/2 && y>=ny/2){
+		                    pixel = input.getPixel(x,y);
+		                    minhasIMG[8].putPixel(x, y-ny/2, pixel);
+		                }
+
+		                if(x>=nx/2 && y>=ny/2){
+		                    pixel = input.getPixel(x,y);
+		                    minhasIMG[9].putPixel(x-nx/2, y-ny/2, pixel);
+		                }	                
+		            }
+		        }
+		    	break;
+
+		    	case 4:
+			    minhasIMG[0] = new ImageAccess(nx/2,ny/2);
+        		minhasIMG[1] = new ImageAccess(nx/2,ny/2);
+        		minhasIMG[2] = new ImageAccess(nx/2,ny/2);
+        		minhasIMG[3] = new ImageAccess(nx/2,ny/2);
+        		minhasIMG[4] = new ImageAccess(nx/2,ny/2);
+        		minhasIMG[5] = new ImageAccess(nx/2,ny/2);
+        		minhasIMG[6] = new ImageAccess(nx/2,ny/2);
+        		minhasIMG[7] = new ImageAccess(nx/2,ny/2);
+        		minhasIMG[8] = new ImageAccess(nx/2,ny/2);
+        		minhasIMG[9] = new ImageAccess(nx/2,ny/2);
+        		minhasIMG[10] = new ImageAccess(nx/2,ny/2);
+        		minhasIMG[11] = new ImageAccess(nx/2,ny/2);
+        		minhasIMG[12] = new ImageAccess(nx/2,ny/2);
+
+		        for(int x=0; x<nx; x++){
+		            for(int y=0; y<ny; y++){
+
+		            	if(x<nx/8 && y<ny/8){
+		                	pixel = input.getPixel(x,y);
+		                    minhasIMG[0].putPixel(x, y, pixel);
+		                }
+
+		                if(x>nx/8 && x<nx/4 && y<ny/8){
+		                	pixel = input.getPixel(x,y);
+		                    minhasIMG[1].putPixel(x-nx/8, y, pixel);
+		                }
+
+		                if(x>nx/8 && y<ny/4 && y>ny/8){
+		                	pixel = input.getPixel(x,y);
+		                    minhasIMG[2].putPixel(x, y-ny/8, pixel);
+		                }
+
+		                if(x<nx/8 && y<ny/8){
+		                	pixel = input.getPixel(x,y);
+		                    minhasIMG[0].putPixel(x, y, pixel);
+		                }
+
+		                if(x>nx/8 && x<nx/4 && y<ny/8){
+		                	pixel = input.getPixel(x,y);
+		                    minhasIMG[1].putPixel(x-nx/8, y, pixel);
+		                }
+
+		                if(x>nx/8 && y<ny/4 && y>ny/8){
+		                	pixel = input.getPixel(x,y);
+		                    minhasIMG[2].putPixel(x, y-ny/8, pixel);
+		                }
+
+		                if(x>nx/8 && x<nx/4 && y>ny/8 && y<ny/8){
+		                	pixel = input.getPixel(x,y);
+		                    minhasIMG[3].putPixel(x-nx/8, y-ny/8, pixel);
+		                }
+
+		                if(x>=nx/4 && y<ny/4 && x<nx/2){
+		                    pixel = input.getPixel(x,y);
+		                    minhasIMG[4].putPixel(x-nx/4, y, pixel);
+		                }
+
+		                if(x<nx/4 && y>=ny/4 && y<ny/2){
+		                    pixel = input.getPixel(x,y);
+		                    minhasIMG[5].putPixel(x, y-ny/4, pixel);
+		                }
+
+		                if(x>=nx/4 && y>=ny/4 && x<nx/2 && y<ny/2){
+		                    pixel = input.getPixel(x,y);
+		                    minhasIMG[6].putPixel(x-nx/4, y-ny/4, pixel);
+		                }
+
+		                if(x>=nx/2 && y<ny/2){
+		                    pixel = input.getPixel(x,y);
+		                    minhasIMG[7].putPixel(x-nx/2, y, pixel);
+		                }
+
+		                if(x<nx/2 && y>=ny/2){
+		                    pixel = input.getPixel(x,y);
+		                    minhasIMG[8].putPixel(x, y-ny/2, pixel);
+		                }
+
+		                if(x>=nx/2 && y>=ny/2){
+		                    pixel = input.getPixel(x,y);
+		                    minhasIMG[9].putPixel(x-nx/2, y-ny/2, pixel);
+		                }	                
+		            }
+		        }
+		    	break;
+
+
             }
             return minhasIMG;
         }
 
-            // case 2:
-            //     ImageAccess new1 = new ImageAccess(nx/2,ny/2);
-            //     ImageAccess new2 = new ImageAccess(nx/2,ny/2);
-            //     ImageAccess new3 = new ImageAccess(nx/2,ny/2);
-            //     ImageAccess new4 = new ImageAccess(nx/2,ny/2);
-            //     ImageAccess new5 = new ImageAccess(nx/2,ny/2);
-            //     ImageAccess new6 = new ImageAccess(nx/2,ny/2);
-            //     ImageAccess new7 = new ImageAccess(nx/2,ny/2);
 
-            //     for(int x=0; x<nx; x++){
-            //         for(int y=0; y<ny; y++){
-
-            //             if(x<nx/4 && y<ny/4){
-            //                 pixel = input.getPixel(x,y);
-            //                 new1.putPixel(x, y, pixel);
-            //             }
-
-            //             if(x>=nx/4 && y<ny/4 && x<nx/2){
-            //                 pixel = input.getPixel(x,y);
-            //                 new2.putPixel(x-nx/4, y, pixel);
-            //             }
-
-            //             if(x<nx/4 && y>=ny/4 && y<ny/2){
-            //                 pixel = input.getPixel(x,y);
-            //                 new3.putPixel(x, y-ny/4, pixel);
-            //             }
-
-            //             if(x>=nx/4 && y>=ny/4 && x<nx/2 && y<ny/2){
-            //                 pixel = input.getPixel(x,y);
-            //                 new4.putPixel(x-nx/4, y-ny/4, pixel);
-            //             }
-
-            //             if(x>=nx/2 && y<ny/2){
-            //                 pixel = input.getPixel(x,y);
-            //                 new5.putPixel(x-nx/2, y, pixel);
-            //             }
-
-            //             if(x<nx/2 && y>=ny/2){
-            //                 pixel = input.getPixel(x,y);
-            //                 new6.putPixel(x, y-ny/2, pixel);
-            //             }
-
-            //             if(x>=nx/2 && y>=ny/2){
-            //                 pixel = input.getPixel(x,y);
-            //                 new7.putPixel(x-nx/2, y-ny/2, pixel);
-            //             }
-            //         }
-            //     }
-            // break;
-
-            // case 3:
-            //     ImageAccess new1 = new ImageAccess(nx/2,ny/2);
-            //     ImageAccess new2 = new ImageAccess(nx/2,ny/2);
-            //     ImageAccess new3 = new ImageAccess(nx/2,ny/2);
-            //     ImageAccess new4 = new ImageAccess(nx/2,ny/2);
-            //     ImageAccess new5 = new ImageAccess(nx/2,ny/2);
-            //     ImageAccess new6 = new ImageAccess(nx/2,ny/2);
-            //     ImageAccess new7 = new ImageAccess(nx/2,ny/2);
-            //     ImageAccess new8 = new ImageAccess(nx/2,ny/2);
-            //     ImageAccess new9= new ImageAccess(nx/2,ny/2);
-            //     ImageAccess new10 = new ImageAccess(nx/2,ny/2);
-
-            //     for(int x=0; x<nx; x++){
-            //         for(int y=0; y<ny; y++){
-
-            //             if(x<nx/8 && y<ny/8){
-            //                 pixel = input.getPixel(x,y);
-            //                 new1.putPixel(x, y, pixel);
-            //             }
-
-            //             if(x>nx/8 && x<nx/4 && y<ny/8){
-            //                 pixel = input.getPixel(x,y);
-            //                 new2.putPixel(x-nx/8, y, pixel);
-            //             }
-
-            //             if(x>nx/8 && y<ny/4 && y>ny/8){
-            //                 pixel = input.getPixel(x,y);
-            //                 new3.putPixel(x, y-ny/8, pixel);
-            //             }
-
-            //             if(x>nx/8 && x<nx/4 && y>ny/8 && y<ny/8){
-            //                 pixel = input.getPixel(x,y);
-            //                 new4.putPixel(x-nx/8, y-ny/8, pixel);
-            //             }
-
-            //             if(x>=nx/4 && y<ny/4 && x<nx/2){
-            //                 pixel = input.getPixel(x,y);
-            //                 new5.putPixel(x-nx/4, y, pixel);
-            //             }
-
-            //             if(x<nx/4 && y>=ny/4 && y<ny/2){
-            //                 pixel = input.getPixel(x,y);
-            //                 new6.putPixel(x, y-ny/4, pixel);
-            //             }
-
-            //             if(x>=nx/4 && y>=ny/4 && x<nx/2 && y<ny/2){
-            //                 pixel = input.getPixel(x,y);
-            //                 new7.putPixel(x-nx/4, y-ny/4, pixel);
-            //             }
-
-            //             if(x>=nx/2 && y<ny/2){
-            //                 pixel = input.getPixel(x,y);
-            //                 new8.putPixel(x-nx/2, y, pixel);
-            //             }
-
-            //             if(x<nx/2 && y>=ny/2){
-            //                 pixel = input.getPixel(x,y);
-            //                 new9.putPixel(x, y-ny/2, pixel);
-            //             }
-
-            //             if(x>=nx/2 && y>=ny/2){
-            //                 pixel = input.getPixel(x,y);
-            //                 new10.putPixel(x-nx/2, y-ny/2, pixel);
-            //             }
-            //         }
-            //     }
-            // break;
 
     public static ImageAccess[] divide4(ImageAccess img){
 
@@ -377,43 +469,4 @@ public class WaveletHaar implements PlugInFilter {
 
         return imagens;
     }
-
-    // static public ImageAccess[] Sep(ImageAccess input){
-    //     int nx = input.getWidth();
-    //     int ny = input.getHeight();
-    //     double pixel = 0.0;
-    //     ImageAccess imagens[] = new ImageAccess[4];
-
-    //     imagens[0] = new ImageAccess(nx/2,ny/2);
-    //     imagens[1] = new ImageAccess(nx/2,ny/2);
-    //     imagens[2] = new ImageAccess(nx/2,ny/2);
-    //     imagens[3] = new ImageAccess(nx/2,ny/2);
-
-    //     for(int x=0; x<nx; x++){
-    //         for(int y=0; y<ny; y++){
-
-    //             if(x<nx/2 && y<ny/2){
-    //                 pixel = input.getPixel(x,y);
-    //                 imagens[0].putPixel(x, y, pixel);
-    //             }
-
-    //             if(x>=nx/2 && y<ny/2){
-    //                 pixel = input.getPixel(x,y);
-    //                 imagens[1].putPixel(x - nx/2, y, pixel);
-    //             }
-
-    //             if(x<nx/2 && y>=ny/2){
-    //                 pixel = input.getPixel(x,y);
-    //                 imagens[2].putPixel(x, y - ny/2, pixel);
-    //             }
-
-    //             if(x>=nx/2 && y>=ny/2){
-    //                 pixel = input.getPixel(x,y);
-    //                 imagens[3].putPixel(x - nx/2, y - ny/2, pixel);
-    //             }
-    //         }
-    //     }
-
-    //     return imagens;
-    // }
 }
