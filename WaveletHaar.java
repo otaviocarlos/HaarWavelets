@@ -8,7 +8,6 @@ import ij.plugin.filter.*;
 public class WaveletHaar implements PlugInFilter {
 
     ImagePlus reference;        // Reference image
-    int k;                      // Number of nearest neighbors
     int level;                  // Wavelet decoposition level
 
     public int setup(String arg, ImagePlus imp) {
@@ -20,16 +19,14 @@ public class WaveletHaar implements PlugInFilter {
 
     public void run(ImageProcessor img) {
 
-        GenericDialog gd = new GenericDialog("k-nearest neighbor search", IJ.getInstance());
-        gd.addNumericField("Number of nearest neighbors (K):", 1, 0);
-        gd.addNumericField("Wavelet decomposition level:", 1, 0);
+        GenericDialog gd = new GenericDialog("Entre com o número", IJ.getInstance());
+        gd.addNumericField("Número de decomposicao de wavelets:", 1, 0);
         gd.showDialog();
         if (gd.wasCanceled())
             return;
-        k = (int) gd.getNextNumber();
         level = (int) gd.getNextNumber();
 
-        SaveDialog sd = new SaveDialog("Open search folder...", "any file (required)", "");
+        SaveDialog sd = new SaveDialog("Abra uma pasta...", "pode ser qualquer nome :D", "");
         if (sd.getFileName()==null) return;
         String dir = sd.getDirectory();
 
@@ -37,13 +34,16 @@ public class WaveletHaar implements PlugInFilter {
     }
 
     public void search(String dir) {
-        IJ.log("");
-        IJ.log("Searching images");
+
         if (!dir.endsWith(File.separator))
             dir += File.separator;
+
         String[] list = new File(dir).list();  /* lista de arquivos */
+
         if (list==null) return;
+
         for (int i=0; i<list.length; i++) {
+
             IJ.showStatus(i+"/"+list.length+": "+list[i]);   /* mostra na interface */
             IJ.showProgress((double)i / list.length);  /* barra de progresso */
             File f = new File(dir+list[i]);
