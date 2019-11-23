@@ -51,8 +51,6 @@ public class WaveletHaar implements PlugInFilter {
                 ImagePlus image = new Opener().openImage(dir, list[i]); /* abre imagem image */
                 if (image != null) {
 
-                image.show();
-
                     // CODIGO
                     ImageAccess output = DoHaar(new ImageAccess(image.getProcessor()), level);
                     (new ImagePlus("Wavelet",output.createByteProcessor())).show();
@@ -110,8 +108,9 @@ public class WaveletHaar implements PlugInFilter {
                 }
             }
             counter++;
-            nx = halfX;
-            ny = halfY;
+            input = imgFinal;
+            nx = imgFinal.getWidth()/2;
+            ny = imgFinal.getHeight()/2;
 
         }
         return imgFinal;    //retorno a imagem final
