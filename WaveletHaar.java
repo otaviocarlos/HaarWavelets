@@ -52,13 +52,12 @@ public class WaveletHaar implements PlugInFilter {
                 ImagePlus image = new Opener().openImage(dir, list[i]); /* abre imagem image */
                 if (image != null) {
 
-                    // CODIGO
                     ImageAccess output = DoHaar(new ImageAccess(image.getProcessor()), level);
-                    (new ImagePlus("Wavelet",output.createByteProcessor())).show();
 
                 }
             }
         }
+
         IJ.showProgress(1.0);
         IJ.showStatus("");
     }
@@ -70,12 +69,14 @@ public class WaveletHaar implements PlugInFilter {
         int nx = input.getWidth();      // quantidade de linhas
         int ny = input.getHeight();     // quantidade de colunas
         int counter = 0;                // contador para interações
+        int tam = 4 + 3 * (level - 1);
+        double[] entropias = new double[tam];
+
 
         ImageAccess imgParcial = new ImageAccess(nx,ny);    // imagem usada durante as transformações
         ImageAccess imgFinal = new ImageAccess(nx,ny);      // imagem final com as transformações
 
         ImageAccess imagens[] = new ImageAccess[4];
-        int tam = 4 + 3 * (level - 1);
         ImageAccess todasIMG[] = new ImageAccess[tam];
 
         while(counter < level){
@@ -120,7 +121,10 @@ public class WaveletHaar implements PlugInFilter {
         }
 
         imagens = Sep(imgFinal, level);
-        mostra(imagens);
+        for (int i=0; i<tam;i++ ) {
+            entropias[i] = entropy(imagens[i]);
+            IJ.write(String.valueOf(entropias[i]));
+        }
 
         return imgFinal;  //retorno a imagem final
     }
@@ -134,7 +138,7 @@ public class WaveletHaar implements PlugInFilter {
 
     }
 
-    public static double entropy(ImageAccess img, int level) {
+    public static double entropy(ImageAccess img) {
 
         int nx = img.getWidth();      // quantidade de linhas
         int ny = img.getHeight();     // quantidade de colunas
@@ -152,8 +156,6 @@ public class WaveletHaar implements PlugInFilter {
 
             }
         }
-
-        IJ.write(String.valueOf(entro));
 
         return entro;
     }
