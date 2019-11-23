@@ -54,9 +54,9 @@ public class WaveletHaar implements PlugInFilter {
                 image.show();
 
                     // CODIGO
-                    ImageAccess output = DoHaar(new ImageAccess(image.getProcessor()));
+                    ImageAccess output = DoHaar(new ImageAccess(image.getProcessor()), level);
                     (new ImagePlus("Wavelet",output.createByteProcessor())).show();
-                
+
                 }
             }
         }
@@ -65,17 +65,17 @@ public class WaveletHaar implements PlugInFilter {
     }
 
     // ESTÁ É A FUNÇÃO WAVELET HAAR
-    static public ImageAccess DoHaar(ImageAccess input){
+    static public ImageAccess DoHaar(ImageAccess input, int level){
         // ainda deve ser colocado como um parametro o numero de interações que o usuario deseja
 
         int nx = input.getWidth();      // quantidade de linhas
         int ny = input.getHeight();     // quantidade de colunas
         int counter = 0;                // contador para interações
-        
+
         ImageAccess imgParcial = new ImageAccess(nx,ny);    // imagem usada durante as transformações
         ImageAccess imgFinal = new ImageAccess(nx,ny);      // imagem final com as transformações
 
-        while(counter < 1){
+        while(counter < level){
             int halfX = nx/2;   // conta metade da imagem no eixo x para separar a op1 e a op2
             int halfY = ny/2;   // conta metade da imagem no eixo y para separar a op1 e a op2
             // para cada linha
@@ -110,6 +110,9 @@ public class WaveletHaar implements PlugInFilter {
                 }
             }
             counter++;
+            nx = halfX;
+            ny = halfY;
+
         }
         return imgFinal;    //retorno a imagem final
     }
