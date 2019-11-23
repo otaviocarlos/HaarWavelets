@@ -72,7 +72,9 @@ public class WaveletHaar implements PlugInFilter {
 
         ImageAccess imgParcial = new ImageAccess(nx,ny);    // imagem usada durante as transformações
         ImageAccess imgFinal = new ImageAccess(nx,ny);      // imagem final com as transformações
-        entropy(input, level);
+        // entropy(input, level);
+        // divide4(input);
+        divide4(input);
 
         while(counter < level){
             int halfX = nx/2;   // conta metade da imagem no eixo x para separar a op1 e a op2
@@ -113,6 +115,7 @@ public class WaveletHaar implements PlugInFilter {
             nx = imgFinal.getWidth()/2;
             ny = imgFinal.getHeight()/2;
 
+
         }
         return imgFinal;    //retorno a imagem final
     }
@@ -144,5 +147,88 @@ public class WaveletHaar implements PlugInFilter {
         return entro;
     }
 
+    public static ImageAccess[] divide4(ImageAccess img){
 
+        int nx = img.getWidth();      // quantidade de linhas
+        int ny = img.getHeight();     // quantidade de colunas
+
+        int px = 0; // coordenada em x da primeira interação do pixel
+        int py = 0; // coordenada em y da primeira interação do pixel
+        int tx = 0; // limite em x da divisão da imagem
+        int ty = 0; // limite em y da divisão da imagem
+
+        ImageAccess imagens[] = new ImageAccess[4];
+
+        double pixel;
+
+        for (int i = 0;i<2;i++) {
+
+            for (int j = 0;j<2;j++) {
+
+                px = i * nx/2;
+                py = j * ny/2;
+
+                tx = (nx/2 * (px +1));
+                ty = (ny/2 * (py +1));
+                imagens[i + (2 * j)] = new ImageAccess(nx/2,ny/2);
+
+                for (int u=px; u<px+nx/2;u++) {
+                    for (int v=py; v<py+ny/2;v++) {
+
+                        pixel = img.getPixel(u,v);
+                        imagens[i+ (2 * j)].putPixel(u,v, pixel);
+
+                    }
+                }
+
+            }
+        }
+
+        (new ImagePlus("Wavelet",imagens[0].createByteProcessor())).show();
+        (new ImagePlus("Wavelet",imagens[1].createByteProcessor())).show();
+        (new ImagePlus("Wavelet",imagens[2].createByteProcessor())).show();
+        (new ImagePlus("Wavelet",imagens[3].createByteProcessor())).show();
+
+        return imagens;
+    }
+
+    static public ImageAccess Sep(ImageAccess input){
+        int nx = input.getWidth();
+        int ny = input.getHeight();
+        double pixel = 0.0;
+        ImageAccess new1 = new ImageAccess(nx/2,ny/2);
+        ImageAccess new2 = new ImageAccess(nx/2,ny/2);
+        ImageAccess new3 = new ImageAccess(nx/2,ny/2);
+        ImageAccess new4 = new ImageAccess(nx/2,ny/2);
+        for(int x=0; x<nx; x++){
+            for(int y=0; y<ny; y++){
+
+                if(x<nx/2 && y<ny/2){
+                    pixel = input.getPixel(x,y);
+                    new1.putPixel(x, y, pixel);
+                }
+
+                if(x>nx/2 && y<ny/2){
+                    pixel = input.getPixel(x,y);
+                    new2.putPixel(x, y, pixel);
+                }
+
+                if(x<nx/2 && y>ny/2){
+                    pixel = input.getPixel(x,y);
+                    new3.putPixel(x, y, pixel);
+                }
+
+                if(x>nx/2 && y>ny/2){
+                    pixel = input.getPixel(x,y);
+                    new4.putPixel(x, y, pixel);
+                }
+            }
+        }
+        (new ImagePlus("Wavelet",new1.createByteProcessor())).show();
+        (new ImagePlus("Wavelet",new2.createByteProcessor())).show();
+        (new ImagePlus("Wavelet",new3.createByteProcessor())).show();
+        (new ImagePlus("Wavelet",new4.createByteProcessor())).show();
+
+        return new4;
+    }
 }
