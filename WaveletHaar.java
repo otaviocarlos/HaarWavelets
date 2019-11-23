@@ -71,6 +71,7 @@ public class WaveletHaar implements PlugInFilter {
         int counter = 0;                // contador para interações
         int tam = 4 + 3 * (level - 1);
         double[] entropias = new double[tam];
+        double[] energias = new double[tam];
 
 
         ImageAccess imgParcial = new ImageAccess(nx,ny);    // imagem usada durante as transformações
@@ -123,7 +124,10 @@ public class WaveletHaar implements PlugInFilter {
         imagens = Sep(imgFinal, level);
         for (int i=0; i<tam;i++ ) {
             entropias[i] = entropy(imagens[i]);
-            IJ.write(String.valueOf(entropias[i]));
+            IJ.write("porin é chato:" + String.valueOf(entropias[i]));
+            energias[i] = energy(imagens[i]);
+            IJ.write(String.valueOf(energias[i]));
+
         }
 
         return imgFinal;  //retorno a imagem final
@@ -158,6 +162,25 @@ public class WaveletHaar implements PlugInFilter {
         }
 
         return entro;
+    }
+
+    public static double energy(ImageAccess input) {
+
+        int nx = input.getWidth();      // quantidade de linhas
+        int ny = input.getHeight();     // quantidade de colunas
+        double energy = 0.0; // vetor
+        int max=0, min=0;
+        double pixel;
+
+        for (int i=0; i < nx; i++) {
+            for (int j=0; j < ny;j++) {
+
+                pixel = input.getPixel(i,j);
+                energy = energy + Math.pow(pixel,2);
+            }
+        }
+
+        return energy;
     }
 
     static public ImageAccess[] Sep(ImageAccess input, int interations){
