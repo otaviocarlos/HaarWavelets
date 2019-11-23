@@ -72,9 +72,10 @@ public class WaveletHaar implements PlugInFilter {
 
         ImageAccess imgParcial = new ImageAccess(nx,ny);    // imagem usada durante as transformações
         ImageAccess imgFinal = new ImageAccess(nx,ny);      // imagem final com as transformações
-        // entropy(input, level);
-        // divide4(input);
-        divide4(input);
+
+        ImageAccess imagens[] = new ImageAccess[4];
+        int tam = 4 + 3 * (level - 1);
+        ImageAccess todasIMG[] = new ImageAccess[tam];
 
         while(counter < level){
             int halfX = nx/2;   // conta metade da imagem no eixo x para separar a op1 e a op2
@@ -96,7 +97,7 @@ public class WaveletHaar implements PlugInFilter {
             }
 
             // para cada coluna
-            for (int j = 0; j<ny; j++){
+            for (int j=0; j<ny; j++){
                 int auxRow = 0; // auxiliar para contar linhas ja que vou rodar a cada duas linhas
                 for (int i=0; i<ny; i+=2){
                     double pixel1 = imgParcial.getPixel(i,j);   // pega o primeiro pixel (da coluna j e linha i)
@@ -115,21 +116,45 @@ public class WaveletHaar implements PlugInFilter {
             nx = imgFinal.getWidth()/2;
             ny = imgFinal.getHeight()/2;
 
+            // for (int i=0; i<level; i++) {
+
+            //     for (int j=0; j<4; j++) {
+
+            //         imagens = Sep(imgFinal);
+            //         todasIMG[tam - j] = imagens[3 - j];
+            //         imagens = Sep(imagens[0]);
+            //     }
+            // }
 
         }
-        return imgFinal;    //retorno a imagem final
+
+        imagens = Sep(imgFinal, level);
+        mostra(imagens);
+        // todasIMG = Sep(imgFinal, level);
+        // (new ImagePlus("Wavelet",todasIMG[0].createByteProcessor())).show();
+        // (new ImagePlus("Wavelet",todasIMG[1].createByteProcessor())).show();
+        // (new ImagePlus("Wavelet",todasIMG[2].createByteProcessor())).show();
+        // (new ImagePlus("Wavelet",todasIMG[3].createByteProcessor())).show();
+
+        return imgFinal;  //retorno a imagem final
     }
 
-    public static double[] entropy (ImageAccess img, int level) {
+
+    public static void mostra(ImageAccess[] img) {
+
+        for(int i=0; i < img.length; i++) {
+            (new ImagePlus("Wavelet",img[i].createByteProcessor())).show();
+        }
+
+    }
+
+    public static double entropy(ImageAccess img, int level) {
 
         int nx = img.getWidth();      // quantidade de linhas
         int ny = img.getHeight();     // quantidade de colunas
-        int tam = 4 + (3 * (level - 1)); // tamanho do vetor
-        double entro[] = new double[tam]; // vetor
+        double entro = 0.0; // vetor
 
         double pixel;
-
-        entro[0] = 0;
 
         for (int i=0; i < nx; i++) {
 
@@ -137,15 +162,176 @@ public class WaveletHaar implements PlugInFilter {
 
                 pixel = img.getPixel(i,j);
                 if (pixel > 0)
-                    entro[0] = entro[0] + (double) (Math.log(pixel) * pixel);
+                    entro = entro + (double) (Math.log(pixel) * pixel);
 
             }
         }
 
-        IJ.write(String.valueOf(entro[0]));
+        IJ.write(String.valueOf(entro));
 
         return entro;
     }
+
+    static public ImageAccess[] Sep(ImageAccess input, int interations){
+        int nx = input.getWidth();
+        int ny = input.getHeight();
+        double pixel = 0.0;
+        ImageAccess[] minhasIMG = new ImageAccess[4 + 3 * (interations - 1) ];
+        minhasIMG[0] = new ImageAccess(nx/2,ny/2);
+        minhasIMG[1] = new ImageAccess(nx/2,ny/2);
+        minhasIMG[2] = new ImageAccess(nx/2,ny/2);
+        minhasIMG[3] = new ImageAccess(nx/2,ny/2);
+        switch(interations) {
+
+            case 1:
+
+                for(int x=0; x<nx; x++){
+                    for(int y=0; y<ny; y++){
+
+                        if(x<nx/2 && y<ny/2){
+                            pixel = input.getPixel(x,y);
+                            minhasIMG[0].putPixel(x, y, pixel);
+                        }
+
+                        if(x>nx/2 && y<ny/2){
+                            pixel = input.getPixel(x,y);
+                            minhasIMG[1].putPixel(x-nx/2, y, pixel);
+                        }
+
+                        if(x<nx/2 && y>=ny/2){
+                            pixel = input.getPixel(x,y);
+                            minhasIMG[2].putPixel(x, y-ny/2, pixel);
+                        }
+
+                        if(x>=nx/2 && y>=ny/2){
+                            pixel = input.getPixel(x,y);
+                            minhasIMG[3].putPixel(x-nx/2, y-ny/2, pixel);
+                        }
+                    }
+                }
+                break;
+
+            }
+            return minhasIMG;
+        }
+
+            // case 2:
+            //     ImageAccess new1 = new ImageAccess(nx/2,ny/2);
+            //     ImageAccess new2 = new ImageAccess(nx/2,ny/2);
+            //     ImageAccess new3 = new ImageAccess(nx/2,ny/2);
+            //     ImageAccess new4 = new ImageAccess(nx/2,ny/2);
+            //     ImageAccess new5 = new ImageAccess(nx/2,ny/2);
+            //     ImageAccess new6 = new ImageAccess(nx/2,ny/2);
+            //     ImageAccess new7 = new ImageAccess(nx/2,ny/2);
+
+            //     for(int x=0; x<nx; x++){
+            //         for(int y=0; y<ny; y++){
+
+            //             if(x<nx/4 && y<ny/4){
+            //                 pixel = input.getPixel(x,y);
+            //                 new1.putPixel(x, y, pixel);
+            //             }
+
+            //             if(x>=nx/4 && y<ny/4 && x<nx/2){
+            //                 pixel = input.getPixel(x,y);
+            //                 new2.putPixel(x-nx/4, y, pixel);
+            //             }
+
+            //             if(x<nx/4 && y>=ny/4 && y<ny/2){
+            //                 pixel = input.getPixel(x,y);
+            //                 new3.putPixel(x, y-ny/4, pixel);
+            //             }
+
+            //             if(x>=nx/4 && y>=ny/4 && x<nx/2 && y<ny/2){
+            //                 pixel = input.getPixel(x,y);
+            //                 new4.putPixel(x-nx/4, y-ny/4, pixel);
+            //             }
+
+            //             if(x>=nx/2 && y<ny/2){
+            //                 pixel = input.getPixel(x,y);
+            //                 new5.putPixel(x-nx/2, y, pixel);
+            //             }
+
+            //             if(x<nx/2 && y>=ny/2){
+            //                 pixel = input.getPixel(x,y);
+            //                 new6.putPixel(x, y-ny/2, pixel);
+            //             }
+
+            //             if(x>=nx/2 && y>=ny/2){
+            //                 pixel = input.getPixel(x,y);
+            //                 new7.putPixel(x-nx/2, y-ny/2, pixel);
+            //             }
+            //         }
+            //     }
+            // break;
+
+            // case 3:
+            //     ImageAccess new1 = new ImageAccess(nx/2,ny/2);
+            //     ImageAccess new2 = new ImageAccess(nx/2,ny/2);
+            //     ImageAccess new3 = new ImageAccess(nx/2,ny/2);
+            //     ImageAccess new4 = new ImageAccess(nx/2,ny/2);
+            //     ImageAccess new5 = new ImageAccess(nx/2,ny/2);
+            //     ImageAccess new6 = new ImageAccess(nx/2,ny/2);
+            //     ImageAccess new7 = new ImageAccess(nx/2,ny/2);
+            //     ImageAccess new8 = new ImageAccess(nx/2,ny/2);
+            //     ImageAccess new9= new ImageAccess(nx/2,ny/2);
+            //     ImageAccess new10 = new ImageAccess(nx/2,ny/2);
+
+            //     for(int x=0; x<nx; x++){
+            //         for(int y=0; y<ny; y++){
+
+            //             if(x<nx/8 && y<ny/8){
+            //                 pixel = input.getPixel(x,y);
+            //                 new1.putPixel(x, y, pixel);
+            //             }
+
+            //             if(x>nx/8 && x<nx/4 && y<ny/8){
+            //                 pixel = input.getPixel(x,y);
+            //                 new2.putPixel(x-nx/8, y, pixel);
+            //             }
+
+            //             if(x>nx/8 && y<ny/4 && y>ny/8){
+            //                 pixel = input.getPixel(x,y);
+            //                 new3.putPixel(x, y-ny/8, pixel);
+            //             }
+
+            //             if(x>nx/8 && x<nx/4 && y>ny/8 && y<ny/8){
+            //                 pixel = input.getPixel(x,y);
+            //                 new4.putPixel(x-nx/8, y-ny/8, pixel);
+            //             }
+
+            //             if(x>=nx/4 && y<ny/4 && x<nx/2){
+            //                 pixel = input.getPixel(x,y);
+            //                 new5.putPixel(x-nx/4, y, pixel);
+            //             }
+
+            //             if(x<nx/4 && y>=ny/4 && y<ny/2){
+            //                 pixel = input.getPixel(x,y);
+            //                 new6.putPixel(x, y-ny/4, pixel);
+            //             }
+
+            //             if(x>=nx/4 && y>=ny/4 && x<nx/2 && y<ny/2){
+            //                 pixel = input.getPixel(x,y);
+            //                 new7.putPixel(x-nx/4, y-ny/4, pixel);
+            //             }
+
+            //             if(x>=nx/2 && y<ny/2){
+            //                 pixel = input.getPixel(x,y);
+            //                 new8.putPixel(x-nx/2, y, pixel);
+            //             }
+
+            //             if(x<nx/2 && y>=ny/2){
+            //                 pixel = input.getPixel(x,y);
+            //                 new9.putPixel(x, y-ny/2, pixel);
+            //             }
+
+            //             if(x>=nx/2 && y>=ny/2){
+            //                 pixel = input.getPixel(x,y);
+            //                 new10.putPixel(x-nx/2, y-ny/2, pixel);
+            //             }
+            //         }
+            //     }
+            // break;
 
     public static ImageAccess[] divide4(ImageAccess img){
 
@@ -176,7 +362,7 @@ public class WaveletHaar implements PlugInFilter {
                     for (int v=py; v<py+ny/2;v++) {
 
                         pixel = img.getPixel(u,v);
-                        imagens[i+ (2 * j)].putPixel(u,v, pixel);
+                        imagens[i+ (2 * j)].putPixel(u-nx,v-ny, pixel);
 
                     }
                 }
@@ -192,43 +378,42 @@ public class WaveletHaar implements PlugInFilter {
         return imagens;
     }
 
-    static public ImageAccess Sep(ImageAccess input){
-        int nx = input.getWidth();
-        int ny = input.getHeight();
-        double pixel = 0.0;
-        ImageAccess new1 = new ImageAccess(nx/2,ny/2);
-        ImageAccess new2 = new ImageAccess(nx/2,ny/2);
-        ImageAccess new3 = new ImageAccess(nx/2,ny/2);
-        ImageAccess new4 = new ImageAccess(nx/2,ny/2);
-        for(int x=0; x<nx; x++){
-            for(int y=0; y<ny; y++){
+    // static public ImageAccess[] Sep(ImageAccess input){
+    //     int nx = input.getWidth();
+    //     int ny = input.getHeight();
+    //     double pixel = 0.0;
+    //     ImageAccess imagens[] = new ImageAccess[4];
 
-                if(x<nx/2 && y<ny/2){
-                    pixel = input.getPixel(x,y);
-                    new1.putPixel(x, y, pixel);
-                }
+    //     imagens[0] = new ImageAccess(nx/2,ny/2);
+    //     imagens[1] = new ImageAccess(nx/2,ny/2);
+    //     imagens[2] = new ImageAccess(nx/2,ny/2);
+    //     imagens[3] = new ImageAccess(nx/2,ny/2);
 
-                if(x>nx/2 && y<ny/2){
-                    pixel = input.getPixel(x,y);
-                    new2.putPixel(x, y, pixel);
-                }
+    //     for(int x=0; x<nx; x++){
+    //         for(int y=0; y<ny; y++){
 
-                if(x<nx/2 && y>ny/2){
-                    pixel = input.getPixel(x,y);
-                    new3.putPixel(x, y, pixel);
-                }
+    //             if(x<nx/2 && y<ny/2){
+    //                 pixel = input.getPixel(x,y);
+    //                 imagens[0].putPixel(x, y, pixel);
+    //             }
 
-                if(x>nx/2 && y>ny/2){
-                    pixel = input.getPixel(x,y);
-                    new4.putPixel(x, y, pixel);
-                }
-            }
-        }
-        (new ImagePlus("Wavelet",new1.createByteProcessor())).show();
-        (new ImagePlus("Wavelet",new2.createByteProcessor())).show();
-        (new ImagePlus("Wavelet",new3.createByteProcessor())).show();
-        (new ImagePlus("Wavelet",new4.createByteProcessor())).show();
+    //             if(x>=nx/2 && y<ny/2){
+    //                 pixel = input.getPixel(x,y);
+    //                 imagens[1].putPixel(x - nx/2, y, pixel);
+    //             }
 
-        return new4;
-    }
+    //             if(x<nx/2 && y>=ny/2){
+    //                 pixel = input.getPixel(x,y);
+    //                 imagens[2].putPixel(x, y - ny/2, pixel);
+    //             }
+
+    //             if(x>=nx/2 && y>=ny/2){
+    //                 pixel = input.getPixel(x,y);
+    //                 imagens[3].putPixel(x - nx/2, y - ny/2, pixel);
+    //             }
+    //         }
+    //     }
+
+    //     return imagens;
+    // }
 }
