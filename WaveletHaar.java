@@ -72,6 +72,7 @@ public class WaveletHaar implements PlugInFilter {
 
         ImageAccess imgParcial = new ImageAccess(nx,ny);    // imagem usada durante as transformações
         ImageAccess imgFinal = new ImageAccess(nx,ny);      // imagem final com as transformações
+        entropy(input, level);
 
         while(counter < level){
             int halfX = nx/2;   // conta metade da imagem no eixo x para separar a op1 e a op2
@@ -115,4 +116,33 @@ public class WaveletHaar implements PlugInFilter {
         }
         return imgFinal;    //retorno a imagem final
     }
+
+    public static double[] entropy (ImageAccess img, int level) {
+
+        int nx = img.getWidth();      // quantidade de linhas
+        int ny = img.getHeight();     // quantidade de colunas
+        int tam = 4 + (3 * (level - 1)); // tamanho do vetor
+        double entro[] = new double[tam]; // vetor
+
+        double pixel;
+
+        entro[0] = 0;
+
+        for (int i=0; i < nx; i++) {
+
+            for (int j=0; j < ny;j++) {
+
+                pixel = img.getPixel(i,j);
+                if (pixel > 0)
+                    entro[0] = entro[0] + (double) (Math.log(pixel) * pixel);
+
+            }
+        }
+
+        IJ.write(String.valueOf(entro[0]));
+
+        return entro;
+    }
+
+
 }
