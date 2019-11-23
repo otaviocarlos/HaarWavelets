@@ -48,6 +48,7 @@ public class WaveletHaar implements PlugInFilter {
             IJ.showProgress((double)i / list.length);  /* barra de progresso */
             File f = new File(dir+list[i]);
             if (!f.isDirectory()) {
+
                 ImagePlus image = new Opener().openImage(dir, list[i]); /* abre imagem image */
                 if (image != null) {
 
@@ -62,7 +63,7 @@ public class WaveletHaar implements PlugInFilter {
         IJ.showStatus("");
     }
 
-   
+
     static public ImageAccess DoHaar(ImageAccess input, int level){
         // ainda deve ser colocado como um parametro o numero de interações que o usuario deseja
 
@@ -116,25 +117,10 @@ public class WaveletHaar implements PlugInFilter {
             nx = halfX;
             ny = halfY;
 
-            // for (int i=0; i<level; i++) {
-
-            //     for (int j=0; j<4; j++) {
-
-            //         imagens = Sep(imgFinal);
-            //         todasIMG[tam - j] = imagens[3 - j];
-            //         imagens = Sep(imagens[0]);
-            //     }
-            // }
-
         }
 
         imagens = Sep(imgFinal, level);
         mostra(imagens);
-        // todasIMG = Sep(imgFinal, level);
-        // (new ImagePlus("Wavelet",todasIMG[0].createByteProcessor())).show();
-        // (new ImagePlus("Wavelet",todasIMG[1].createByteProcessor())).show();
-        // (new ImagePlus("Wavelet",todasIMG[2].createByteProcessor())).show();
-        // (new ImagePlus("Wavelet",todasIMG[3].createByteProcessor())).show();
 
         return imgFinal;  //retorno a imagem final
     }
@@ -259,7 +245,7 @@ public class WaveletHaar implements PlugInFilter {
 		                if(x>=nx/2 && y>=ny/2){
 		                    pixel = input.getPixel(x,y);
 		                    minhasIMG[6].putPixel(x-nx/2, y-ny/2, pixel);
-		                }	                
+		                }
 		            }
 		        }
 		    	break;
@@ -327,7 +313,7 @@ public class WaveletHaar implements PlugInFilter {
 		                if(x>=nx/2 && y>=ny/2){
 		                    pixel = input.getPixel(x,y);
 		                    minhasIMG[9].putPixel(x-nx/2, y-ny/2, pixel);
-		                }	                
+		                }
 		            }
 		        }
 		    	break;
@@ -413,7 +399,7 @@ public class WaveletHaar implements PlugInFilter {
 		                if(x>=nx/2 && y>=ny/2){
 		                    pixel = input.getPixel(x,y);
 		                    minhasIMG[12].putPixel(x-nx/2, y-ny/2, pixel);
-		                }                
+		                }
 		            }
 		        }
 		    	break;
@@ -517,7 +503,7 @@ public class WaveletHaar implements PlugInFilter {
 		                if(x>=nx/2 && y>=ny/2){
 		                    pixel = input.getPixel(x,y);
 		                    minhasIMG[15].putPixel(x-nx/2, y-ny/2, pixel);
-		                }                
+		                }
 		            }
 		        }
 		    	break;
@@ -527,50 +513,4 @@ public class WaveletHaar implements PlugInFilter {
             return minhasIMG;
         }
 
-
-
-    public static ImageAccess[] divide4(ImageAccess img){
-
-        int nx = img.getWidth();      // quantidade de linhas
-        int ny = img.getHeight();     // quantidade de colunas
-
-        int px = 0; // coordenada em x da primeira interação do pixel
-        int py = 0; // coordenada em y da primeira interação do pixel
-        int tx = 0; // limite em x da divisão da imagem
-        int ty = 0; // limite em y da divisão da imagem
-
-        ImageAccess imagens[] = new ImageAccess[4];
-
-        double pixel;
-
-        for (int i = 0;i<2;i++) {
-
-            for (int j = 0;j<2;j++) {
-
-                px = i * nx/2;
-                py = j * ny/2;
-
-                tx = (nx/2 * (px +1));
-                ty = (ny/2 * (py +1));
-                imagens[i + (2 * j)] = new ImageAccess(nx/2,ny/2);
-
-                for (int u=px; u<px+nx/2;u++) {
-                    for (int v=py; v<py+ny/2;v++) {
-
-                        pixel = img.getPixel(u,v);
-                        imagens[i+ (2 * j)].putPixel(u-nx,v-ny, pixel);
-
-                    }
-                }
-
-            }
-        }
-
-        (new ImagePlus("Wavelet",imagens[0].createByteProcessor())).show();
-        (new ImagePlus("Wavelet",imagens[1].createByteProcessor())).show();
-        (new ImagePlus("Wavelet",imagens[2].createByteProcessor())).show();
-        (new ImagePlus("Wavelet",imagens[3].createByteProcessor())).show();
-
-        return imagens;
-    }
 }
