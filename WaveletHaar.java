@@ -71,14 +71,15 @@ public class WaveletHaar implements PlugInFilter {
         int ny = input.getHeight();     // quantidade de colunas
         int counter = 0;                // contador para interações
         int tam = 4 + 3 * (level - 1);
-        double[] entropias = new double[tam];
-        double[] energias = new double[tam];
+        double[] entropias = new double[nome.length * tam];
+        double[] energias = new double[nome.length * tam];
+
 
 
         ImageAccess imgParcial = new ImageAccess(nx,ny);    // imagem usada durante as transformações
         ImageAccess imgFinal = new ImageAccess(nx,ny);      // imagem final com as transformações
 
-        ImageAccess imagens[] = new ImageAccess[4];
+        ImageAccess imagens[] = new ImageAccess[tam];
         ImageAccess todasIMG[] = new ImageAccess[tam];
 
         while(counter < level){
@@ -124,28 +125,72 @@ public class WaveletHaar implements PlugInFilter {
 
         imagens = Sep(imgFinal, level);
 
-        
+            for (int j=0;j<tam;j++ ) {
+
+	            entropias[j] = entropy(imagens[j]);
+	            energias[j] = energy(imagens[j]);
+
+            }
+
+           entropias = Normalization(entropias);
+           energias = Normalization(energias);
 
         try{
-        	FileWriter arq = new FileWriter("caracteristicas.txt");
-       		PrintWriter gravarArq = new PrintWriter(arq);
-       		for (int i=0; i<tam;i++ ) {
-	            entropias[i] = entropy(imagens[i]);
-	           // IJ.write("porin é chato:" + String.valueOf(entropias[i]));
-	            energias[i] = energy(imagens[i]);
-	           // IJ.write(String.valueOf(energias[i]));
-	            gravarArq.printf(nome[i] + "\n");
-	            gravarArq.printf("Entropia:" + String.valueOf(entropias[i]) + "\nEnergia:" + String.valueOf(energias[i]) + "\n\n");
-	        }
- 
+
+        	FileWriter arq = new FileWriter("tabuada.txt");
+            PrintWriter gravarArq = new PrintWriter(arq);
+
+            for (int i=0; i<nome.length; i++) {
+
+                for (int j=0; j<tam ;j++ ) {
+
+                    gravarArq.printf(nome[i] + "\n");
+                    gravarArq.printf("Entropia:" + entropias[i * j] + "\nEnergia:" + energias[i * j] + "\n\n");
+                }
+            }
+
+
         arq.close();
         } catch(IOException e) {
         	System.out.println("erro: " + e);
         }
 
+        // caract = GenerateVector(energias,entropias,tam);
+        // IJ.write(String.valueOf(caract[0]));
+
+
         return imgFinal;  //retorno a imagem final
     }
 
+    public static double[] Normalization(double[] vector){
+        double[] output = new double[vector.length];
+        output = vector;
+        double aux, max, min;
+        aux=0;
+        max=0;
+        min=0;
+        for(int i=0; i<vector.length; i++) {
+            aux = output[i];
+            if(max<aux)
+                max = aux;
+            if(min>aux)
+                min = aux;
+        }
+        for(int i=0; i<vector.length; i++){
+            output[i] = (output[i]-min)/(max-min);
+        }
+        return output;
+    }
+
+    public static double[] GenerateVector(double[] vectorEnergy, double[] vectorEntropy, int vectorLength){
+        vectorLength = vectorLength*2;
+        double[] output = new double[vectorLength];
+        for(int i=0; i<vectorLength; i+=2){
+            output[i] = vectorEnergy[i];
+            output[i+1] = vectorEntropy[i];
+        }
+        return output;
+    }
 
     public static void mostra(ImageAccess[] img) {
 
@@ -547,11 +592,11 @@ public class WaveletHaar implements PlugInFilter {
 		    	break;
 
 
-		    	
+
             }
             return minhasIMG;
         }
 
 
-        
+
 }
