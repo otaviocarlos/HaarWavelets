@@ -4,6 +4,7 @@ import ij.io.*;
 import ij.process.*;
 import ij.gui.*;
 import ij.plugin.filter.*;
+import java.io.IOException;
 
 public class WaveletHaar implements PlugInFilter {
 
@@ -52,7 +53,7 @@ public class WaveletHaar implements PlugInFilter {
                 ImagePlus image = new Opener().openImage(dir, list[i]); /* abre imagem image */
                 if (image != null) {
 
-                    ImageAccess output = DoHaar(new ImageAccess(image.getProcessor()), level);
+                    ImageAccess output = DoHaar(new ImageAccess(image.getProcessor()), level, list);
 
                 }
             }
@@ -63,7 +64,7 @@ public class WaveletHaar implements PlugInFilter {
     }
 
 
-    static public ImageAccess DoHaar(ImageAccess input, int level){
+    static public ImageAccess DoHaar (ImageAccess input, int level, String[] nome){
         // ainda deve ser colocado como um parametro o numero de interações que o usuario deseja
 
         int nx = input.getWidth();      // quantidade de linhas
@@ -122,12 +123,24 @@ public class WaveletHaar implements PlugInFilter {
         }
 
         imagens = Sep(imgFinal, level);
-        for (int i=0; i<tam;i++ ) {
-            entropias[i] = entropy(imagens[i]);
-            IJ.write("porin é chato:" + String.valueOf(entropias[i]));
-            energias[i] = energy(imagens[i]);
-            IJ.write(String.valueOf(energias[i]));
 
+        
+
+        try{
+        	FileWriter arq = new FileWriter("caracteristicas.txt");
+       		PrintWriter gravarArq = new PrintWriter(arq);
+       		for (int i=0; i<tam;i++ ) {
+	            entropias[i] = entropy(imagens[i]);
+	           // IJ.write("porin é chato:" + String.valueOf(entropias[i]));
+	            energias[i] = energy(imagens[i]);
+	           // IJ.write(String.valueOf(energias[i]));
+	            gravarArq.printf(nome[i] + "\n");
+	            gravarArq.printf("Entropia:" + String.valueOf(entropias[i]) + "\nEnergia:" + String.valueOf(energias[i]) + "\n\n");
+	        }
+ 
+        arq.close();
+        } catch(IOException e) {
+        	System.out.println("erro: " + e);
         }
 
         return imgFinal;  //retorno a imagem final
@@ -534,8 +547,11 @@ public class WaveletHaar implements PlugInFilter {
 		    	break;
 
 
+		    	
             }
             return minhasIMG;
         }
 
+
+        
 }
