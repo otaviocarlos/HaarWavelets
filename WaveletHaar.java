@@ -20,8 +20,8 @@ public class WaveletHaar implements PlugInFilter {
 
     public void run(ImageProcessor img) {
 
-        GenericDialog gd = new GenericDialog("Entre com o número", IJ.getInstance());
-        gd.addNumericField("Número de decomposicao de wavelets:", 1, 0);
+        GenericDialog gd = new GenericDialog("Entre com o numero", IJ.getInstance());
+        gd.addNumericField("Numero de decomposicao de wavelets:", 1, 0);
         gd.showDialog();
         if (gd.wasCanceled())
             return;
@@ -63,24 +63,19 @@ public class WaveletHaar implements PlugInFilter {
         IJ.showStatus("");
     }
 
-
+    // faz a wavelet haar
     static public ImageAccess DoHaar (ImageAccess input, int level, String[] nome){
         // ainda deve ser colocado como um parametro o numero de interações que o usuario deseja
 
         int nx = input.getWidth();      // quantidade de linhas
         int ny = input.getHeight();     // quantidade de colunas
         int counter = 0;                // contador para interações
-        int tam = 4 + 3 * (level - 1);
-        double[] entropias = new double[nome.length * tam];
-        double[] energias = new double[nome.length * tam];
-
-
-
-        ImageAccess imgParcial = new ImageAccess(nx,ny);    // imagem usada durante as transformações
-        ImageAccess imgFinal = new ImageAccess(nx,ny);      // imagem final com as transformações
-
-        ImageAccess imagens[] = new ImageAccess[tam];
-        ImageAccess todasIMG[] = new ImageAccess[tam];
+        int tam = 4 + 3 * (level - 1);	// quantidade de imagens geradas
+        double[] entropias = new double[nome.length * tam];	// vetor para energias
+        double[] energias = new double[nome.length * tam];	// vetor para entropias
+        ImageAccess imgParcial = new ImageAccess(nx,ny);	// imagem usada durante as transformações
+        ImageAccess imgFinal = new ImageAccess(nx,ny);		// imagem final (pos transformações)
+        ImageAccess imagens[] = new ImageAccess[tam];		//
 
         while(counter < level){
             int halfX = nx/2;   // conta metade da imagem no eixo x para separar a op1 e a op2
@@ -116,59 +111,61 @@ public class WaveletHaar implements PlugInFilter {
                     auxRow++;   // passo o auxiliar para a proxima linha
                 }
             }
-            counter++;
-            input = imgFinal;
-            nx = halfX;
+            counter++;			// aumenta o counter para ver quantas vezes dividir a imagem (counter para level)
+            input = imgFinal;	// input vira a imagem final formada
+            //divide o tamanho da imagem atual na metade
+            nx = halfX; 
             ny = halfY;
 
         }
 
+        // separando imagens
         imagens = Sep(imgFinal, level);
 
             for (int j=0;j<tam;j++ ) {
-
-	            entropias[j] = entropy(imagens[j]);
-	            energias[j] = energy(imagens[j]);
+	            entropias[j] = entropy(imagens[j]);	// vetor com as entropias
+	            energias[j] = energy(imagens[j]);	// vetor com as energias
 
             }
-
-           entropias = Normalization(entropias);
-           energias = Normalization(energias);
+            // normalizacao
+            entropias = Normalization(entropias);
+            energias = Normalization(energias);
 
         try{
-
-        	FileWriter arq = new FileWriter("tabuada.txt");
+        	// crio um arquivo do tipo txt chamado arq chamado Haar (Energia e Entropia)
+        	FileWriter arq = new FileWriter("Haar (Energia e Entropia).txt");
+        	// printa as representacoes formatas dos objetos para um output de texto
             PrintWriter gravarArq = new PrintWriter(arq);
 
             for (int i=0; i<nome.length; i++) {
+                    gravarArq.printf(nome[i] + "\n");				// nome do arquivo utilizado
+                    gravarArq.printf("Energia e Entropia [  ");		// escreve "Energia e Entropia ["
 
                 for (int j=0; j<tam ;j++ ) {
-
-                    gravarArq.printf(nome[i] + "\n");
-                    gravarArq.printf("Entropia:" + entropias[i * j] + "\nEnergia:" + energias[i * j] + "\n\n");
+                	// ecreve os valores de enrgia e entropia para cada vetor de imagens
+                    gravarArq.printf(entropias[i * j] + " " + energias[i * j] + " ");
                 }
+                	// escreve "]"
+                    gravarArq.printf("]\n\n");
+
             }
-
-
-        arq.close();
+            // fecha o arquivo da imagem atual e salva o mesmo
+            arq.close();
         } catch(IOException e) {
         	System.out.println("erro: " + e);
         }
 
-        // caract = GenerateVector(energias,entropias,tam);
-        // IJ.write(String.valueOf(caract[0]));
-
-
         return imgFinal;  //retorno a imagem final
     }
 
+    // normaliza o vetor passado como parametro
     public static double[] Normalization(double[] vector){
-        double[] output = new double[vector.length];
-        output = vector;
-        double aux, max, min;
-        aux=0;
-        max=0;
-        min=0;
+        double[] output = new double[vector.length]; 	// vetor do mesmo tamanho do vetor passado
+        output = vector;								// variavel recebe o vetor passado como parametro
+        double aux, max, min;							// variaveis auxiliares
+        aux=0;												// variavel para contar o tamanho do vetor 
+        max=0;												// variavel para achar o maximo
+        min=0;												// variavel para achar o minimo
         for(int i=0; i<vector.length; i++) {
             aux = output[i];
             if(max<aux)
@@ -177,7 +174,7 @@ public class WaveletHaar implements PlugInFilter {
                 min = aux;
         }
         for(int i=0; i<vector.length; i++){
-            output[i] = (output[i]-min)/(max-min);
+            output[i] = (output[i]-min)/(max-min);		// normaliza os resultados
         }
         return output;
     }
@@ -192,6 +189,7 @@ public class WaveletHaar implements PlugInFilter {
         return output;
     }
 
+    // apresenta a imagem passada como parametro
     public static void mostra(ImageAccess[] img) {
 
         for(int i=0; i < img.length; i++) {
@@ -200,35 +198,32 @@ public class WaveletHaar implements PlugInFilter {
 
     }
 
+    // calcula a entropia para uma imagem passada como parametro
     public static double entropy(ImageAccess img) {
 
-        int nx = img.getWidth();      // quantidade de linhas
-        int ny = img.getHeight();     // quantidade de colunas
-        double entro = 0.0; // vetor
-
-        double pixel;
+        int nx = img.getWidth();      	// quantidade de linhas
+        int ny = img.getHeight();     	// quantidade de colunas
+        double entro = 0.0;				// variavel para calcular a entropia
+        double pixel;					// variavel para calcular o pixel
 
         for (int i=0; i < nx; i++) {
-
             for (int j=0; j < ny;j++) {
-
                 pixel = img.getPixel(i,j);
-                if (pixel > 0)
+                if (pixel > 0)	// pois sera feita a operacao log
                     entro = entro + (double) (Math.log(pixel) * pixel);
-
             }
         }
-
+        entro = entro*-1;		// a somatoria eh negativa
         return entro;
     }
 
+    // calcula a energia para uma imagem passada como parametro
     public static double energy(ImageAccess input) {
 
         int nx = input.getWidth();      // quantidade de linhas
         int ny = input.getHeight();     // quantidade de colunas
-        double energy = 0.0; // vetor
-        int max=0, min=0;
-        double pixel;
+        double energy = 0.0;			// variavel para calcular a energia
+        double pixel;					// variavel para calcular o pixel
 
         for (int i=0; i < nx; i++) {
             for (int j=0; j < ny;j++) {
@@ -241,11 +236,12 @@ public class WaveletHaar implements PlugInFilter {
         return energy;
     }
 
+    // separa a imagem passada como parametro dependendo do numero de interacoes
     static public ImageAccess[] Sep(ImageAccess input, int interations){
-        int nx = input.getWidth();
-        int ny = input.getHeight();
-        double pixel = 0.0;
-        ImageAccess[] minhasIMG = new ImageAccess[4 + 3 * (interations - 1) ];
+        int nx = input.getWidth();	// largura
+        int ny = input.getHeight();	// altura
+        double pixel = 0.0;			// variavel para capturar o valor do pixel
+        ImageAccess[] minhasIMG = new ImageAccess[4 + 3 * (interations - 1) ];	// vetor de imagens para armazenar as imagens separadas
 
         switch(interations) {
 
@@ -290,7 +286,6 @@ public class WaveletHaar implements PlugInFilter {
         		minhasIMG[4] = new ImageAccess(nx/2,ny/2);
         		minhasIMG[5] = new ImageAccess(nx/2,ny/2);
         		minhasIMG[6] = new ImageAccess(nx/2,ny/2);
-        		minhasIMG[7] = new ImageAccess(nx/2,ny/2);
 
 		        for(int x=0; x<nx; x++){
 		            for(int y=0; y<ny; y++){
@@ -596,7 +591,5 @@ public class WaveletHaar implements PlugInFilter {
             }
             return minhasIMG;
         }
-
-
 
 }
