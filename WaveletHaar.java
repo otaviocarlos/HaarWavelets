@@ -11,6 +11,9 @@ public class WaveletHaar implements PlugInFilter {
     ImagePlus reference;        // Reference image
     int level;                  // Wavelet decoposition level
 
+    // implementação do metodo setup da classe abstrata PlugInFilter
+    // ete método recebe uma imagem (que esta aberta no momento) e então a converte para 8 bits em nivel de cinza
+
     public int setup(String arg, ImagePlus imp) {
         reference = imp;
         ImageConverter ic = new ImageConverter(imp);
@@ -18,39 +21,61 @@ public class WaveletHaar implements PlugInFilter {
         return DOES_ALL;
     }
 
+    // implementação do metodo run da classe abstrata PlugInFilter
+    // neste método o usuário abre uma pasta de interesse e é retornado o caminho do diretório
     public void run(ImageProcessor img) {
 
+        // instancia uma janela no imageJ escrita "Entre com o numero"
         GenericDialog gd = new GenericDialog("Entre com o numero", IJ.getInstance());
+        // adiciona um campo na janela escrito Numero de decomposicao de wavelets:
         gd.addNumericField("Numero de decomposicao de wavelets:", 1, 0);
+        // mostra a janela
         gd.showDialog();
+
+        // retorna a funcao se for cancelada
         if (gd.wasCanceled())
             return;
+
+        // pega o parametro level da janela
         level = (int) gd.getNextNumber();
 
+        // abre uma janela para o ususario escolher um diretorio
         SaveDialog sd = new SaveDialog("Abra uma pasta...", "pode ser qualquer nome :D", "");
+        // se o diretorio for NULL retorna
         if (sd.getFileName()==null) return;
+
+        // pega o caminho do diretorio
         String dir = sd.getDirectory();
 
+        // chama search para o caminho de diretorio
         search(dir);
     }
 
+    //  neste método é passado um caminho de diretório e então procura-se por todas as imagems no diretorio e por fim efetuado o wavelets para todas as imagens pertencentes a esta pasta
     public void search(String dir) {
 
+        // separa as palavras do caminho do diretorio
         if (!dir.endsWith(File.separator))
             dir += File.separator;
 
+        // instancia uma lista que ira contem cada palavra do caminho do diretorio
         String[] list = new File(dir).list();  /* lista de arquivos */
 
+        // se o caminho não existir retorna
         if (list==null) return;
 
+        // para cada arquivo no diretorio
         for (int i=0; i<list.length; i++) {
 
             IJ.showStatus(i+"/"+list.length+": "+list[i]);   /* mostra na interface */
             IJ.showProgress((double)i / list.length);  /* barra de progresso */
+            // instancia um novo arquivo da pasta
             File f = new File(dir+list[i]);
             if (!f.isDirectory()) {
 
+                // tenta instanciar uma imagem
                 ImagePlus image = new Opener().openImage(dir, list[i]); /* abre imagem image */
+                // se for possivel chama o método doHar
                 if (image != null) {
 
                     ImageAccess output = DoHaar(new ImageAccess(image.getProcessor()), level, list);
@@ -114,7 +139,7 @@ public class WaveletHaar implements PlugInFilter {
             counter++;			// aumenta o counter para ver quantas vezes dividir a imagem (counter para level)
             input = imgFinal;	// input vira a imagem final formada
             //divide o tamanho da imagem atual na metade
-            nx = halfX; 
+            nx = halfX;
             ny = halfY;
 
         }
@@ -163,7 +188,7 @@ public class WaveletHaar implements PlugInFilter {
         double[] output = new double[vector.length]; 	// vetor do mesmo tamanho do vetor passado
         output = vector;								// variavel recebe o vetor passado como parametro
         double aux, max, min;							// variaveis auxiliares
-        aux=0;												// variavel para contar o tamanho do vetor 
+        aux=0;												// variavel para contar o tamanho do vetor
         max=0;												// variavel para achar o maximo
         min=0;												// variavel para achar o minimo
         for(int i=0; i<vector.length; i++) {
